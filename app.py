@@ -1,6 +1,6 @@
+from modules.api import search,get_answer,search_sistani,get_answer_sistani
 from pyrogram.types import InlineKeyboardButton,InlineKeyboardMarkup
 from modules.db import set_key,get_key,delete_key
-from modules.api import search,get_answer
 from pyrogram import Client, filters
 from dotenv import load_dotenv
 from io import BytesIO
@@ -35,6 +35,9 @@ async def handle_callback_query(client:Client, call):
             return await client.send_message(message.chat.id,"تم الغاء الطلب ✅")
         elif data.startswith("https://www.aqaed.com"):
             return await search_aqaed(client,message,data)
+        elif data.startswith("SIS;"):
+            id = data.replace("SIS;","")
+            return await sistani_search(client,message,id)
         question = get_key(f"user:{message.chat.id}:state").split(":")[-1]
         if data == "aqaed":
             return await ask_aqaed(client,message,question)
@@ -64,12 +67,13 @@ async def ask_aqaed(client,message,question):
         else:
             await client.delete_messages(message.chat.id,wait_message.id)
             await client.send_message(message.chat.id,"لا توجد نتائج")
+            delete_key(message.chat.id)
     except Exception:
         logging.error(traceback.format_exc())
         await client.delete_messages(message.chat.id,wait_message.id)
         await client.send_message(message.chat.id,"⚠️ حدث خطأ الرجاء اعاده المحاولة❗")
+        delete_key(message.chat.id)
 
-    delete_key(message.chat.id)
 
 async def search_aqaed(client:Client,message,url):
     await client.delete_messages(message.chat.id,message.id)
@@ -86,6 +90,7 @@ async def search_aqaed(client:Client,message,url):
         else:
             await client.delete_messages(message.chat.id,wait_message.id)
             await client.send_message(message.chat.id,"⚠️ حدث خطأ الرجاء اعاده المحاولة❗")
+            
     except Exception:
         logging.error(traceback.format_exc())
     
@@ -94,25 +99,81 @@ async def search_aqaed(client:Client,message,url):
 
 
 async def ask_sistani(client:Client,message,question):
-    keyboard = InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton("البحث في مركز أبحاث العقائدية ", callback_data="aqaed:"+question),
-                ],
-                [
-                    InlineKeyboardButton("الغاء", callback_data="cancel"),
-                ],
-            ])
     await client.delete_messages(message.chat.id,message.id)
-    await client.send_message(message.chat.id,"جار العمل على مصدر السيد السيستاني\n\nيمكنك البحث في مركز أبحاث العقائدية في الوقت الحالي",reply_markup=keyboard)
+    wait_message = await client.send_message(message.chat.id,"⌛")
+    data = await search_sistani(question)
+
+    buttons = []
+    try:
+        if data:
+            for obj in data:
+                buttons.append([InlineKeyboardButton(obj["quz"].replace("\n", ""),callback_data="SIS;"+obj["id"])])
+            buttons.append([InlineKeyboardButton("الغاء", callback_data="cancel"),])
+            keyboard = InlineKeyboardMarkup(buttons)
+            await client.delete_messages(message.chat.id,wait_message.id)
+            await client.send_message(message.chat.id,"""نتائج البحث 🔍
+                                      
+
+.                                        
+""",reply_markup=keyboard)
+        else:
+            await client.delete_messages(message.chat.id,wait_message.id)
+            await client.send_message(message.chat.id,"لا توجد نتائج")
+            delete_key(message.chat.id)
+    except Exception:
+        logging.error(traceback.format_exc())
+        await client.delete_messages(message.chat.id,wait_message.id)
+        await client.send_message(message.chat.id,"⚠️ حدث خطأ الرجاء اعاده المحاولة❗")
+        delete_key(message.chat.id)
+    
+
+async def sistani_search(client:Client,message,id):
+    await client.delete_messages(message.chat.id,message.id)
+    wait_message = await client.send_message(message.chat.id,"⌛")
+    results = await get_answer_sistani(id)
+    try:
+        if results:
+            question = results["quz"].replace("\n", "")
+            answer = results["answer"].replace("\n", "")
+            topic = results["topic"]
+            await client.send_message(message.chat.id,f"""{topic}
+                                      
+السؤال {question}
+
+
+الجواب {answer}
+""")
+            await client.delete_messages(message.chat.id,wait_message.id)
+        else:
+            await client.delete_messages(message.chat.id,wait_message.id)
+            await client.send_message(message.chat.id,"⚠️ حدث خطأ الرجاء اعاده المحاولة❗")
+    except Exception:
+        logging.error(traceback.format_exc())
+    
+    delete_key(message.chat.id)
 
 @app.on_message(filters.command("start"))
 async def start_command(client, message):
-    await message.reply_text(f"""
+    reply_text =f"""
                  اهلا 👋 بك {message.from_user.first_name} في الموسوعة الدينية. 
 
 .للبدأ باستخدام البوت الرجاء إرسال سؤالك
 
-""")
+"""
+    key = f"user:{message.chat.id}:state"
+    user_state = get_key(key)
+    if user_state:
+        user_state = user_state.split(":")[0]
+        if user_state == "wait":
+            await client.delete_messages(message.chat.id,message.id)
+            reply_text="""❗الرجاء أنظار الطلب السابق او إلغائه
+
+.
+"""
+            set_key(key,f"spam:{message.text}",(5*60))
+        else:
+            return await client.delete_messages(message.chat.id,message.id)
+    await message.reply_text(reply_text)
 
 @app.on_message(filters.text)
 async def handle_text(client:Client, message):

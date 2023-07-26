@@ -1,0 +1,46 @@
+ERROR:root:Traceback (most recent call last):
+  File "/home/mt-mad/Projects/python/islamic_guy/app.py", line 38, in handle_callback_query
+    question = get_key(f"user:{message.chat.id}:state").split(":")[-1]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'split'
+
+ERROR:root:Traceback (most recent call last):
+  File "/home/mt-mad/Projects/python/islamic_guy/app.py", line 40, in handle_callback_query
+    return await search__sistani(client,message,id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mt-mad/Projects/python/islamic_guy/app.py", line 130, in search__sistani
+    results = await get_answer_sistani(id)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mt-mad/Projects/python/islamic_guy/modules/api.py", line 174, in get_answer_sistani
+    result_question = results_divs[i].text.replace(results_divs[i].find('div',class_='b').text,"")
+                      ~~~~~~~~~~~~^^^
+TypeError: list indices must be integers or slices, not str
+
+WARNING:weasyprint:Ignored `font-style:bold` at 1:31, invalid value.
+WARNING:weasyprint:Ignored `src:url("NotoKufiArabic-Bold.woff2") format("woff2")` at 1:63, Relative URI reference without a base URI: 'NotoKufiArabic-Bold.woff2'.
+WARNING:weasyprint:Ignored `font-display:swap` at 1:116, descriptor not supported.
+WARNING:weasyprint:Missing src descriptor in '@font-face' rule at 1:1
+WARNING:weasyprint:Ignored `box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.45)` at 88:2, unknown property.
+WARNING:weasyprint:Ignored `background: -webkit-gradient(linear, left bottom, left top, from(rgba(0,7,88,0.8)), to(#080067))` at 123:2, invalid value.
+WARNING:weasyprint:Ignored `background-image:url("all-icon-svg.svg")` at 142:1, Relative URI reference without a base URI: 'all-icon-svg.svg'.
+WARNING:weasyprint:Ignored `overflow-x: hidden` at 253:2, unknown property.
+WARNING:weasyprint:Ignored `overflow-x: hidden
+` at 274:2, unknown property.
+WARNING:weasyprint:Ignored `overflow-y: auto` at 278:2, unknown property.
+WARNING:weasyprint:Ignored `background:
+    linear-gradient(
+      rgba(0, 0, 0, .7), 
+      rgba(0, 0, 0, .8)
+    ),
+		url("/s/worldmap.jpg")` at 354:3, Relative URI reference without a base URI: '/s/worldmap.jpg'.
+WARNING:weasyprint:Ignored `background: linear-gradient(rgba(0, 0, 0, .6),rgba(0, 0, 0, .7)),url("/s/bg.jpg")` at 492:2, Relative URI reference without a base URI: '/s/bg.jpg'.
+WARNING:weasyprint:Expected a media type, got '(min-width:1280px)'
+WARNING:weasyprint:Invalid media type ' (min-width:1280px)' the whole @media rule was ignored at 527:1.
+WARNING:weasyprint:Expected a media type, got '(min-width: 576px)and/**/(max-width:992px)'
+WARNING:weasyprint:Invalid media type ' (min-width: 576px) and (max-width:992px)' the whole @media rule was ignored at 532:1.
+WARNING:weasyprint:Expected a media type, got '(max-width: 978px)'
+WARNING:weasyprint:Invalid media type ' (max-width: 978px) ' the whole @media rule was ignored at 671:1.
+WARNING:weasyprint:Ignored `background-image:url(/static/img/pdf_24x24.png)` at 699:9, Relative URI reference without a base URI: '/static/img/pdf_24x24.png'.
+WARNING:weasyprint:Ignored `background-image:url(/static/img/rar_24x24.png)` at 700:9, Relative URI reference without a base URI: '/static/img/rar_24x24.png'.
+WARNING:weasyprint:Ignored `background-image:url(/static/img/epub_24x24.png)` at 701:10, Relative URI reference without a base URI: '/static/img/epub_24x24.png'.
+WARNING:weasyprint:Ignored `padding-right:5vw` at 1:1, invalid value.
