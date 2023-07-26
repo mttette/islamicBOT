@@ -1,0 +1,8 @@
+beautifulsoup4
+pyrogram
+TgCrypto
+redis
+aiohttp
+python-dotenv
+weasyprint
+uvloop
